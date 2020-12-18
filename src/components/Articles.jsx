@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Article from "./Article";
-import DeleteArticles from "./DeleteArticles";
-import SingleArticle from "./SingleArticle";
 import CreateArea from "./CreateArea";
 import queryString from "querystring";
 
@@ -13,17 +11,16 @@ function Articles() {
   });
 
   useEffect(() => {
-    // setAppState({ loading: true });
+    setAppState({ loading: true });
     const articlesUrl = "http://localhost:9000/articles/";
     fetch(articlesUrl)
       .then((res) => res.json())
       .then((res) => {
         setAppState({ loading: false, single: false, articles: res });
       });
-  }, [appState]);
+  }, [setAppState]);
 
   function addArticle(newArticle) {
-    console.log(newArticle);
     const articlesUrl = "http://localhost:9000/articles/";
     fetch(articlesUrl, {
       method: "POST",
@@ -33,11 +30,22 @@ function Articles() {
       .then((res) => res.json())
       .then((data) => console.log("Success: ", data))
       .catch((err) => console.error("Error: ", err));
+    setAppState({ loading: true });
   }
 
-  function fetchOneArticle(title) {
+  function deleteArticles(id) {
+    const articlesUrl = single
+      ? "http://localhost:9000/articles/" + id
+      : "http://localhost:9000/articles/";
+    fetch(articlesUrl, { method: "DELETE" })
+      .then((res) => res.json())
+      .then((data) => console.log(data));
     setAppState({ loading: true });
-    const articleUrl = `http://localhost:9000/articles/${title}`;
+  }
+
+  function fetchOneArticle(id) {
+    setAppState({ loading: true });
+    const articleUrl = `http://localhost:9000/articles/${id}`;
     fetch(articleUrl)
       .then((res) => res.json())
       .then((res) => {
@@ -45,6 +53,30 @@ function Articles() {
       });
 
     return <Article title={articles.title} content={articles.content} />;
+  }
+
+  function putArticles(id, article) {
+    const articlesUrl = `http://localhost:9000/articles/${id}`;
+    fetch(articlesUrl, {
+      method: "PUT",
+      body: queryString.stringify(article),
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data));
+    setAppState({ loading: true });
+  }
+
+  function patchArticles(id, article) {
+    const articlesUrl = `http://localhost:9000/articles/${id}`;
+    fetch(articlesUrl, {
+      method: "PATCH",
+      body: queryString.stringify(article),
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data));
+    setAppState({ loading: true });
   }
 
   const { loading, single, articles } = appState;
@@ -64,6 +96,10 @@ function Articles() {
               <Article
                 key={article._id}
                 id={article._id}
+                onPut={putArticles}
+                onPatch={patchArticles}
+                onDelete={deleteArticles}
+                single={single}
                 title={article.title}
                 content={
                   single
@@ -72,18 +108,20 @@ function Articles() {
                 }
               />
               {!single && (
-                <SingleArticle
-                  fetchOne={fetchOneArticle}
-                  title={article.title}
-                  single={single}
-                />
+                <button
+                  onClick={() => {
+                    fetchOneArticle(article._id);
+                  }}
+                >
+                  Read more
+                </button>
               )}
             </div>
           );
         })
       )}
-      <CreateArea onAdd={addArticle} />
-      <DeleteArticles single={single} />
+      {!single && <CreateArea onAdd={addArticle} />}
+      {!single && <button onClick={deleteArticles}>Delete all article</button>}
     </div>
   );
 }
