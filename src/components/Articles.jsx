@@ -11,14 +11,14 @@ function Articles() {
   });
 
   useEffect(() => {
-    setAppState({ loading: true });
+    // setAppState({ loading: true });
     const articlesUrl = "http://localhost:9000/articles/";
     fetch(articlesUrl)
       .then((res) => res.json())
       .then((res) => {
         setAppState({ loading: false, single: false, articles: res });
       });
-  }, [setAppState]);
+  }, [appState.loading]);
 
   function addArticle(newArticle) {
     const articlesUrl = "http://localhost:9000/articles/";
@@ -44,14 +44,13 @@ function Articles() {
   }
 
   function fetchOneArticle(id) {
-    setAppState({ loading: true });
     const articleUrl = `http://localhost:9000/articles/${id}`;
     fetch(articleUrl)
       .then((res) => res.json())
       .then((res) => {
         setAppState({ loading: false, single: true, articles: [res] });
       });
-
+    // setAppState({ loading: true });
     return <Article title={articles.title} content={articles.content} />;
   }
 
@@ -83,6 +82,7 @@ function Articles() {
 
   return (
     <div>
+      {!single && <CreateArea onAdd={addArticle} />}
       {loading ? (
         <p style={{ textAlign: "center" }}>
           Hold on, fetching data may take some time.
@@ -92,13 +92,14 @@ function Articles() {
       ) : (
         articles.map((article) => {
           return (
-            <div>
+            <div className="container">
               <Article
                 key={article._id}
                 id={article._id}
                 onPut={putArticles}
                 onPatch={patchArticles}
                 onDelete={deleteArticles}
+                fetchOne={fetchOneArticle}
                 single={single}
                 title={article.title}
                 content={
@@ -107,21 +108,15 @@ function Articles() {
                     : article.content.substring(0, 100) + " ..."
                 }
               />
-              {!single && (
-                <button
-                  onClick={() => {
-                    fetchOneArticle(article._id);
-                  }}
-                >
-                  Read more
-                </button>
-              )}
             </div>
           );
         })
       )}
-      {!single && <CreateArea onAdd={addArticle} />}
-      {!single && <button onClick={deleteArticles}>Delete all article</button>}
+      {!single && (
+        <form className="delete-article">
+          <button onClick={deleteArticles}>Delete all article</button>
+        </form>
+      )}
     </div>
   );
 }

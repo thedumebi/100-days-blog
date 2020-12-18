@@ -1,12 +1,14 @@
 import React from "react";
 import Articles from "./Articles";
+import Header from "./Header";
+import Footer from "./Footer";
 
 function App() {
-
   return (
     <div>
-      <h1>My articles</h1>
+      <Header />
       <Articles />
+      <Footer />
     </div>
   );
 }

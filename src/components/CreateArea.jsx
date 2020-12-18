@@ -2,10 +2,9 @@ import React, { useState } from "react";
 
 function CreateArea(props) {
   const [article, setArticle] = useState({
-    title: "",
-    content: "",
+    title: props.type ==="put"? null : props.title,
+    content: props.type === "put" ? null : props.content,
   });
-
   function handleChange(event) {
     const { name, value } = event.target;
     setArticle((prevValue) => {
@@ -42,17 +41,15 @@ function CreateArea(props) {
 
   return (
     <div>
-      <form>
-        <input
-          onChange={handleChange}
-          name="title"
-          placeholder="Title of post"
-        />
+      <form className="create-article">
+        <input type="text" onChange={handleChange} name="title" placeholder={props.type ? props.title : "Title of post" }/>
         <textarea
           onChange={handleChange}
           name="content"
           placeholder="What is it about?"
-        />
+        >
+          {props.content}
+        </textarea>
         <button
           onClick={
             props.type === "put"
@@ -66,7 +63,7 @@ function CreateArea(props) {
             ? "Edit Entire Article"
             : props.type === "patch"
             ? "Edit part of article"
-            : "Create new article"}
+            : "Add"}
         </button>
       </form>
     </div>

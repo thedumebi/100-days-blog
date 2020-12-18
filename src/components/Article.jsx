@@ -1,25 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import CreateArea from "./CreateArea";
 
 function Article(props) {
+  const [edit, setEdit] = useState({ status: false, type: "" });
   function deleteArticle() {
-    props.onDelete(props.id)
+    props.onDelete(props.id);
   }
 
   function editFullArticle() {
-    <CreateArea type= "put" id={props.id} method={props.onPut}/>
+    setEdit({ status: true, type: "put" });
   }
 
   function editPartArticle() {
-    <CreateArea type = "patch" id={props.id} method={props.onPatch}/>
+    setEdit({ status: true, type: "patch" });
   }
 
-  return (
-    <div>
+  return edit.status ? (
+    <CreateArea
+      type={edit.type}
+      id={props.id}
+      method={props.onPut}
+      title={props.title}
+      content={props.content}
+    />
+  ) : (
+    <div className="article">
       <h1>{props.title}</h1>
       <p>{props.content}</p>
-      {props.single && <button onClick={editFullArticle}>Edit entire article</button>}
-      {props.single && <button onClick={editPartArticle}>Edit part of Article</button>}
+      {!props.single && (
+        <button
+          onClick={() => {
+            props.fetchOne(props.id);
+          }}
+        >
+          Read more
+        </button>
+      )}
+      {props.single && (
+        <button onClick={editFullArticle}>Edit entire article</button>
+      )}
+      {props.single && (
+        <button onClick={editPartArticle}>Edit part of Article</button>
+      )}
       {props.single && <button onClick={deleteArticle}>Delete Article</button>}
     </div>
   );
