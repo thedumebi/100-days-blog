@@ -23,11 +23,12 @@ function Form(props) {
   function submitLogin() {
     const url = "http://localhost:9000/login/";
     fetch(url, {
+      credentials: "include",
       method: "POST",
-      body: queryString.stringify(login),
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: JSON.stringify(login),
+      headers: { "Content-Type": "application/json" },
     })
-      .then((res) => console.log(res))
+      .then((res) => console.log(res.data))
       .then((res) => res)
     props.login(true);
   }
@@ -76,7 +77,7 @@ function Form(props) {
 
       <button
         onClick={props.isRegistered ? submitLogin : submitRegister}
-        type="submit"
+        type="button"
       >
         {props.isRegistered ? "Login" : "Register"}
       </button>

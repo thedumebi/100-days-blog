@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import Header from "./Header";
+import Footer from "./Footer";
 import Article from "./Article";
 import CreateArea from "./CreateArea";
 import queryString from "querystring";
@@ -82,6 +84,7 @@ function Articles() {
 
   return (
     <div>
+      <Header />
       {!single && <CreateArea onAdd={addArticle} />}
       {loading ? (
         <p style={{ textAlign: "center" }}>
@@ -90,9 +93,9 @@ function Articles() {
       ) : articles.length === 0 ? (
         <p style={{ textAlign: "center" }}>No articles yet.</p>
       ) : (
-        articles.map((article) => {
-          return (
-            <div className="container">
+        <div className="container">
+          {articles.map((article) => {
+            return (
               <Article
                 key={article._id}
                 id={article._id}
@@ -108,15 +111,16 @@ function Articles() {
                     : article.content.substring(0, 100) + " ..."
                 }
               />
-            </div>
-          );
-        })
+            );
+          })}
+          {!single && (
+            <form className="delete-article">
+              <button onClick={deleteArticles}>Delete all article</button>
+            </form>
+          )}
+        </div>
       )}
-      {!single && (
-        <form className="delete-article">
-          <button onClick={deleteArticles}>Delete all article</button>
-        </form>
-      )}
+      <Footer />
     </div>
   );
 }

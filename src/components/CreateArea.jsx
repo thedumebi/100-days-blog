@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 
 function CreateArea(props) {
+  const [isExtended, setExtended] = useState(false);
   const [article, setArticle] = useState({
-    title: props.type ==="put"? null : props.title,
+    title: props.type === "put" ? null : props.title,
     content: props.type === "put" ? null : props.content,
   });
+
   function handleChange(event) {
     const { name, value } = event.target;
     setArticle((prevValue) => {
@@ -39,34 +41,46 @@ function CreateArea(props) {
     event.preventDefault();
   }
 
+  function extend() {
+    setExtended(true);
+  }
+
   return (
-    <div>
-      <form className="create-article">
-        <input type="text" onChange={handleChange} name="title" placeholder={props.type ? props.title : "Title of post" }/>
-        <textarea
+    <form className="create-article">
+      {isExtended && (
+        <input
           onChange={handleChange}
-          name="content"
-          placeholder="What is it about?"
-        >
-          {props.content}
-        </textarea>
-        <button
-          onClick={
-            props.type === "put"
-              ? putArticle
-              : props.type === "patch"
-              ? patchArticle
-              : submitArticle
-          }
-        >
-          {props.type === "put"
-            ? "Edit Entire Article"
+          name="title"
+          value={article.title}
+          placeholder={props.type ? props.title : "Title of post"}
+        />
+      )}
+      <textarea
+        onClick={extend}
+        onChange={handleChange}
+        name="content"
+        placeholder="What is it about?"
+        rows={isExtended ? 3 : 1}
+        value={article.content}
+      >
+        {props.content}
+      </textarea>
+      <button
+        onClick={
+          props.type === "put"
+            ? putArticle
             : props.type === "patch"
-            ? "Edit part of article"
-            : "Add"}
-        </button>
-      </form>
-    </div>
+            ? patchArticle
+            : submitArticle
+        }
+      >
+        {props.type === "put"
+          ? "Edit Entire Article"
+          : props.type === "patch"
+          ? "Edit part of article"
+          : "Add"}
+      </button>
+    </form>
   );
 }
 
