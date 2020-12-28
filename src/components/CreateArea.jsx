@@ -1,11 +1,15 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 
 function CreateArea(props) {
   const [isExtended, setExtended] = useState(false);
   const [article, setArticle] = useState({
-    title: props.type === "put" ? null : props.title,
-    content: props.type === "put" ? null : props.content,
+    title:
+      props.type === "put" ? null : props.type === "patch" ? props.title : "",
+    content:
+      props.type === "put" ? null : props.type === "patch" ? props.content : "",
   });
+  const history = useHistory();
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -14,13 +18,22 @@ function CreateArea(props) {
     });
   }
 
-  function submitArticle(event) {
-    props.onAdd(article);
+  function addArticle(event) {
+    console.log(article);
+    const articlesUrl = "http://localhost:9000/articles/";
+    fetch(articlesUrl, {
+      method: "POST",
+      body: JSON.stringify(article),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then((data) => console.log("Success: ", data))
+      .catch((err) => console.error("Error: ", err));
     setArticle({
       title: "",
       content: "",
     });
-    event.preventDefault();
+    history.push("/articles");
   }
 
   function putArticle(event) {
@@ -66,12 +79,13 @@ function CreateArea(props) {
         {props.content}
       </textarea>
       <button
+        type="button"
         onClick={
           props.type === "put"
             ? putArticle
             : props.type === "patch"
             ? patchArticle
-            : submitArticle
+            : addArticle
         }
       >
         {props.type === "put"

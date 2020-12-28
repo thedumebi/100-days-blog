@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import Article from "./Article";
-import CreateArea from "./CreateArea";
 import queryString from "querystring";
 
 function Articles() {
   const [appState, setAppState] = useState({
-    loading: true,
+    loading: false,
     single: false,
     articles: null,
   });
@@ -21,19 +20,6 @@ function Articles() {
         setAppState({ loading: false, single: false, articles: res });
       });
   }, [appState.loading]);
-
-  function addArticle(newArticle) {
-    const articlesUrl = "http://localhost:9000/articles/";
-    fetch(articlesUrl, {
-      method: "POST",
-      body: queryString.stringify(newArticle),
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    })
-      .then((res) => res.json())
-      .then((data) => console.log("Success: ", data))
-      .catch((err) => console.error("Error: ", err));
-    setAppState({ loading: true });
-  }
 
   function deleteArticles(id) {
     const articlesUrl = single
@@ -53,7 +39,6 @@ function Articles() {
         setAppState({ loading: false, single: true, articles: [res] });
       });
     // setAppState({ loading: true });
-    return <Article title={articles.title} content={articles.content} />;
   }
 
   function putArticles(id, article) {
@@ -85,12 +70,11 @@ function Articles() {
   return (
     <div>
       <Header />
-      {!single && <CreateArea onAdd={addArticle} />}
       {loading ? (
         <p style={{ textAlign: "center" }}>
           Hold on, fetching data may take some time.
         </p>
-      ) : articles.length === 0 ? (
+      ) : !articles || articles.length === 0 ? (
         <p style={{ textAlign: "center" }}>No articles yet.</p>
       ) : (
         <div className="container">

@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import CreateArea from "./CreateArea";
+import { useRouteMatch, Link } from "react-router-dom";
 
 function Article(props) {
+  let {url} = useRouteMatch();
   const [edit, setEdit] = useState({ status: false, type: "", method: "" });
   
   function deleteArticle() {
@@ -29,13 +31,14 @@ function Article(props) {
       <h1>{props.title}</h1>
       <p>{props.content}</p>
       {!props.single && (
-        <button
+        <Link
+          to={`${url}/${props.id}`}
           onClick={() => {
             props.fetchOne(props.id);
           }}
         >
           Read more
-        </button>
+        </Link>
       )}
       {props.single && (
         <button onClick={editFullArticle}>Edit entire article</button>
